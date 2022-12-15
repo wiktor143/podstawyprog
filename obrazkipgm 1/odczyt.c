@@ -139,7 +139,23 @@ void polprogowanie_czerni(int obraz[][MAX], int wymx, int wymy, int odcienie)
     }
   }
 }
-
+int zapisz(FILE *plik_ost, char *tabnazwa, int obrazkon[][MAX], int wymx, int wymy, int odcienie)
+{
+  int i, j;
+  printf("Podaj nazwę pod jaką chcesz zapisać swój nowy plik .pgm:\n");
+  scanf("%s", tabnazwa);                                  // zapis nazwy podanej przez użytkownika do tablicy
+  plik_ost = fopen(tabnazwa, "w");                        // tworzenie pliku o podanej nazwie
+  fprintf(plik_ost, "P2\n");                              // wpisanie do nowo utworzonego pliku, magicznego P2,
+  fprintf(plik_ost, "%d %d\n%d\n", wymx, wymy, odcienie); // rozmiarów i szarości
+  for (i = 0; i < wymy; i++)
+  {
+    for (j = 0; j < wymx; j++)
+    {
+      fprintf(plik_ost, " %d ", obrazkon[i][j]); // podmienie orginalnych wartości przez funkcje która była
+    }                                            // użyta w menu wyboru
+    fprintf(plik_ost, "\n");
+  }
+}
 int main()
 {
   int obraz[MAX][MAX];
@@ -152,12 +168,25 @@ int main()
   int opcja;
   int i, j;
 
-  while (opcja != 6) // Proste menu do wyboru przez użytkownika za pomoca switcha, wybranie cyfry 6 kończy działanie programu
-  { printf("\n\n");
+  printf("Witaj w programie do przetwarzania obrazów pgm\n\n");
+  // Wczytanie zawartosci wskazanego pliku do pamieci
+  printf("Podaj nazwe swojego pliku:\n");
+  scanf("%s", nazwa);
+  plik = fopen(nazwa, "r");
+
+  if (plik != NULL)
+  { // co spowoduje zakomentowanie tego warunku */
+    odczytano = czytaj(plik, obraz, &wymx, &wymy, &odcienie);
+    fclose(plik);
+  }
+
+  do
+  // Proste menu do wyboru przez użytkownika za pomoca switcha, wybranie cyfry 6 kończy działanie programu
+  {
+    printf("\n\n");
     printf("Powiedz mi co chcesz zrobić ze swoim obrazem, wybierz jedną z opcji poniżej.\n");
-    printf("Pamiętaj o końcówce .pgm !\n\n");
     printf("Proste menu: \n");
-    printf("1-Chce podać nazwę obrazu i go wyświetlić\n");
+    printf("1-Chce wyświetlić mój obraz\n");
     printf("2-Wykonaj progowanie\n");
     printf("3-Wykonaj negatyw\n");
     printf("4-Wykonaj półprogowanie czerni\n");
@@ -170,16 +199,6 @@ int main()
     case 1: // opcja nr 1. Wyświetlenie podanego przez użytkownika obrazu
     {
 
-      // Wczytanie zawartosci wskazanego pliku do pamieci
-      printf("Podaj nazwe pliku:\n");
-      scanf("%s", nazwa);
-      plik = fopen(nazwa, "r");
-
-      if (plik != NULL)
-      { // co spowoduje zakomentowanie tego warunku */
-        odczytano = czytaj(plik, obraz, &wymx, &wymy, &odcienie);
-        fclose(plik);
-      }
       // Wyswietlenie poprawnie wczytanego obraza zewnetrznym programem
       if (odczytano != 0)
       {
@@ -207,27 +226,13 @@ int main()
     }
     case 5: // opcja nr 5. zapis pod wskazaną przez użytkownika nazwą i zapis
     {
-      printf("Podaj nazwę pod jaką chcesz zapisać swój nowy plik .pgm:\n");
-      scanf("%s", nowanazwa);                             // zapis nazwy podanej przez użytkownika do tablicy
-      plik = fopen(nowanazwa, "w");                       // tworzenie pliku o podanej nazwie
-      fprintf(plik, "P2\n");                              // wpisanie do nowo utworzonego pliku, magicznego P2,
-      fprintf(plik, "%d %d\n%d\n", wymx, wymy, odcienie); // rozmiarów i szarości
-      for (i = 0; i < wymy; i++)
-      {
-        for (j = 0; j < wymx; j++)
-        {
-          fprintf(plik, " %d ", obraz[i][j]);             // podmienie orginalnych wartości przez funkcje która była
-        }                                                 // użyta w menu wyboru
-        fprintf(plik, "\n");
-      }
+      zapisz(plik, nowanazwa, obraz, wymx, wymy, odcienie);
       wyswietl(nowanazwa);
-      return odczytano;
-      break;
       return odczytano;
       break;
     }
     case 6:
-    printf("Mam nadzieje, że jeszcze kiedyś się zobaczymy :)\n\n");
+      printf("Mam nadzieje, że jeszcze kiedyś się zobaczymy :)\n\n");
     }
-  }
+  } while (opcja != 6);
 }
