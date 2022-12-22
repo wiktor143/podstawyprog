@@ -36,8 +36,8 @@ int czytaj(FILE *plik_we, int obraz_pgm[][MAX], int *wymx, int *wymy, int *odcie
 
   if ((buf[0] != 'P') || (buf[1] != '2') || koniec)
   { /* Czy jest magiczne "P2"? */
-    fprintf(stderr, "Blad: To nie jest plik PGM\n");
-    return (0);
+    fprintf(stderr, "Blad: To nie jest plik PGM, rozpoczni od nowa.\n");
+    exit(1);
   }
 
   /* Pominiecie komentarzy */
@@ -155,6 +155,8 @@ int zapisz(FILE *plik_ost, char *tabnazwa, int obrazkon[][MAX], int wymx, int wy
     }                                            // użyta w menu wyboru
     fprintf(plik_ost, "\n");
   }
+  printf("Utworzono nowy plik w aktualnym foldzerze o nazwie %s\n", tabnazwa);
+  return 0;
 }
 int main()
 {
@@ -166,27 +168,34 @@ int main()
   char nazwa[100];
   char nowanazwa[100];
   int opcja;
-  int i, j;
 
   printf("Witaj w programie do przetwarzania obrazów pgm\n\n");
-  // Wczytanie zawartosci wskazanego pliku do pamieci
-  printf("Podaj nazwe swojego pliku:\n");
-  scanf("%s", nazwa);
-  plik = fopen(nazwa, "r");
-
-  if (plik != NULL)
-  { // co spowoduje zakomentowanie tego warunku */
-    odczytano = czytaj(plik, obraz, &wymx, &wymy, &odcienie);
-    fclose(plik);
-  }
-
   do
-  // Proste menu do wyboru przez użytkownika za pomoca switcha, wybranie cyfry 6 kończy działanie programu
+  {
+    printf("Podaj nazwe swojego pliku:\n");            // prosimy użytkownika o nazwę pliku wejściowego
+    printf("(koniecznie pamiętaj o końcówce .pgm)\n"); // przypominamy aby plik kończył sie .pgm
+    scanf("%s", nazwa);
+    plik = fopen(nazwa, "r");
+
+    if (plik == NULL)
+    {
+      printf("Blad: Nie ma takiego pliku!\n\n"); // jeżeli nie podamy uchwytu do pliku wyskakuje taki komunikat
+    }
+
+    if (plik != NULL)
+    {
+      odczytano = czytaj(plik, obraz, &wymx, &wymy, &odcienie);
+      printf("liczba pikseli w pliku %s wynosi: %d", nazwa, odczytano); // program wyświetli nam liczbę pikseli w pliku
+      fclose(plik);
+    }
+  } while (plik == NULL); // powtarzamy wczytywanie dopóki uzytkownik nie poda istniejącgo pliku
+
+  do // Proste menu do wyboru przez użytkownika za pomoca switcha, wybranie cyfry 6 kończy działanie programu
   {
     printf("\n\n");
     printf("Powiedz mi co chcesz zrobić ze swoim obrazem, wybierz jedną z opcji poniżej.\n");
     printf("Proste menu: \n");
-    printf("1-Chce wyświetlić mój obraz\n");
+    printf("1-Chce wyświetlić wczytany obraz\n");
     printf("2-Wykonaj progowanie\n");
     printf("3-Wykonaj negatyw\n");
     printf("4-Wykonaj półprogowanie czerni\n");
@@ -226,13 +235,16 @@ int main()
     }
     case 5: // opcja nr 5. zapis pod wskazaną przez użytkownika nazwą i zapis
     {
-      zapisz(plik, nowanazwa, obraz, wymx, wymy, odcienie);
+      zapisz(plik, nowanazwa, obraz, wymx, wymy, odcienie); // zapis przerobionego obrazu za pomocą funkcji zapisz
       wyswietl(nowanazwa);
-      return odczytano;
-      break;
+      fclose(plik);
+      return 0;
     }
-    case 6:
+    case 6: // opcja nr 6. zakończenie działania programu
+    {
       printf("Mam nadzieje, że jeszcze kiedyś się zobaczymy :)\n\n");
     }
-  } while (opcja != 6);
+    }
+  } while (opcja != 6); // warunek zamknięcia pętli
+  return 0;
 }
