@@ -59,7 +59,7 @@ int czytaj(FILE *plik_we, int obraz_pgm[][MAX], int *wymx, int *wymy, int *odcie
   if (fscanf(plik_we, "%d %d %d", wymx, wymy, odcienie) != 3)
   {
     fprintf(stderr, "Blad: Brak wymiarow obrazu lub liczby stopni odcienie\n");
-    return (0);
+    exit(1);
   }
   /* Pobranie obrazu i zapisanie w tablicy obraz_pgm*/
   for (i = 0; i < *wymy; i++)
@@ -69,7 +69,7 @@ int czytaj(FILE *plik_we, int obraz_pgm[][MAX], int *wymx, int *wymy, int *odcie
       if (fscanf(plik_we, "%d", &(obraz_pgm[i][j])) != 1)
       {
         fprintf(stderr, "Blad: Niewlasciwe wymiary obrazu\n");
-        return (0);
+        exit(1);
       }
     }
   }
